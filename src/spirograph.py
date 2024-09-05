@@ -3,7 +3,6 @@
 import pygame
 import random
 import datetime
-from pygame.examples.cursors import surf
 
 
 def take_screenshot(surface):
@@ -18,6 +17,13 @@ def random_color():
     return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
 
+def initialize(outer_circle_radius, outer_circle_position):
+    inner_circle_radius = outer_circle_radius * random.random()
+    inner_circle_position = outer_circle_position + outer_circle_radius - inner_circle_radius
+    pen_radius = inner_circle_radius * random.random()
+    return inner_circle_position, pen_radius, inner_circle_radius, None
+
+
 def main():
     pygame.init()
 
@@ -28,17 +34,12 @@ def main():
     surface.fill("black")
     
     # outer circle
-    outer_circle_radius = pygame.Vector2(min(width, height) // 2, 0)
+    outer_circle_radius = pygame.Vector2(min(width, height) // 2, 0) 
     outer_circle_position = pygame.Vector2(width // 2, height // 2)
     
     # inner circle
-    inner_circle_radius = outer_circle_radius * random.random()
-    inner_circle_position = outer_circle_position + outer_circle_radius - inner_circle_radius
-    
-    pen_radius = inner_circle_radius * random.random()
-    
-    last_pen_position = None
-    
+    inner_circle_position, pen_radius, inner_circle_radius, last_pen_position = initialize(outer_circle_radius, outer_circle_position)
+
     # Drawing Surface
     drawing_surface = pygame.surface.Surface(window_dimensions)
     drawing_surface.fill("black")
@@ -71,6 +72,8 @@ def main():
                         rotation_speed += .1
                     case pygame.K_MINUS:
                         rotation_speed -= .1
+                    case pygame.K_RETURN:
+                        inner_circle_position, pen_radius, inner_circle_radius, last_pen_position = initialize(outer_circle_radius, outer_circle_position)
                     
         # Fill screen black
         surface.fill("black")
@@ -78,10 +81,10 @@ def main():
         # Merge surfaces
         surface.blit(drawing_surface, (0, 0))
         
-        # Draw inner circle
+        # inner circle
         inner_circle_position = outer_circle_position + (inner_circle_position - outer_circle_position).rotate(rotation_speed)
 
-        # Draw pen
+        # pen
         pen_radius = pen_radius.rotate(-rotation_speed * outer_circle_radius.length() / inner_circle_radius.length())
         pen_position = inner_circle_position + pen_radius
         
